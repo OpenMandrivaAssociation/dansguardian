@@ -2,21 +2,20 @@
 %{?_with_clamav: %{expand: %%global build_clamav 1}}
 %{?_without_clamav: %{expand: %%global build_clamav 0}}
 
-%define new_name dansguardian
 %define AV_version 6.3.8
 
 Summary:	A content filtering web proxy
-Name:		DansGuardian
+Name:		dansguardian
 Version:	2.8.0.6
-Release:	%mkrel 4
+Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
-Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.source.tar.bz2
-Source1:	dansguardian.init
-Patch0:		dansguardian-2.8.0.4-no-static-libz.diff
+Source0:	http://www.%{name}.org/downloads/2/%{name}-%{version}.source.tar.bz2
+Source1:	%{name}.init
+Patch0:		%{name}-2.8.0.4-no-static-libz.diff
 # (oe) http://www.harvest.com.br/asp/afn/dg.nsf
-Patch3:		dansguardian-2.8.0.4-antivirus-%{AV_version}.diff
+Patch3:		%{name}-2.8.0.4-antivirus-%{AV_version}.diff
 BuildRequires:	zlib-devel
 %if %{build_clamav}
 BuildRequires:	clamav-devel libesmtp5-devel
@@ -26,7 +25,9 @@ Requires(postun): rpm-helper
 Requires(pre):	squid
 Requires:	webserver
 Requires:	squid
-BuildRoot:	%{_tmppath}/%{new_name}-buildroot
+Provides:	DansGuardian = %{version}-%{release}
+Obsoletes:	DansGuardian
+BuildRoot:	%{_tmppath}/%{name}-buildroot
 
 %description
 DansGuardian is a filtering proxy for Linux, FreeBSD, OpenBSD and Solaris. 
@@ -59,33 +60,32 @@ http://www.harvest.com.br/asp/afn/dg.nsf
 
 %prep
 
-%setup -q -n dansguardian-%{version}
+%setup -q -n %{name}-%{version}
 %patch0 -p0
+
 %if %{build_clamav}
 %patch3 -p1
 %endif
 
-cp %{SOURCE1} dansguardian.init
+cp %{SOURCE1} %{name}.init
 
 %build
-
-export CFLAGS="%{optflags}"
-export CXXFLAGS="%{optflags}"
+%serverbuild
 
 ./configure \
     --installprefix=%{_prefix} \
     --bindir=%{_bindir}/ \
-    --sysconfdir=%{_sysconfdir}/%{new_name}/ \
+    --sysconfdir=%{_sysconfdir}/%{name}/ \
     --sysvdir=%{_initrddir}/ \
     --cgidir=/var/www/cgi-bin/ \
     --mandir=%{_mandir}/ \
-    --logdir=/var/log/%{new_name}/ \
+    --logdir=/var/log/%{name}/ \
     --runas_usr=squid \
     --runas_grp=squid \
     --piddir=/var/run \
     --logrotatedir=%{_sysconfdir}/logrotate.d/
 
-%make OPTIMISE="%{optflags}" WARNING="-Wall -Wno-deprecated"
+%make OPTIMISE="$CFLAGS" WARNING="-Wall -Wno-deprecated"
 
 %install
 rm -rf %{buildroot}
@@ -95,10 +95,10 @@ export DONT_GPRINTIFY=1
 
 install -d %{buildroot}%{_sbindir}
 install -d %{buildroot}%{_mandir}/man8
-install -d %{buildroot}%{_sysconfdir}/%{new_name}
+install -d %{buildroot}%{_sysconfdir}/%{name}
 install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}%{_initrddir}
-install -d %{buildroot}/var/log/dansguardian
+install -d %{buildroot}/var/log/%{name}
 install -d %{buildroot}/var/spool/MailScanner/quarantine
 install -d %{buildroot}/var/www/cgi-bin
 
@@ -108,52 +108,52 @@ ln -sf /bin/true bin/chown
 
 make install INSTALLPREFIX=%{buildroot} CHKCONF=nowhere
 mv %{buildroot}%{_bindir}/* %{buildroot}%{_sbindir}
-install -m0755 dansguardian.init %{buildroot}%{_initrddir}/dansguardian
+install -m0755 %{name}.init %{buildroot}%{_initrddir}/%{name}
 
-cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/dansguardian
-/var/log/dansguardian/access.log {
+cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+/var/log/%{name}/access.log {
     rotate 5
     weekly
     sharedscripts
     prerotate
-	service dansguardian stop
+	service %{name} stop
     endscript
     postrotate
-	service dansguardian start
+	service %{name} start
     endscript
 }
 EOF
 
 # construct file lists
-find %{buildroot}%{_sysconfdir}/%{new_name} -type d | \
+find %{buildroot}%{_sysconfdir}/%{name} -type d | \
     sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0755,squid,squid) %dir /' > %{name}.filelist
 
-find %{buildroot}%{_sysconfdir}/%{new_name} -type f | grep -v "\.orig" | \
+find %{buildroot}%{_sysconfdir}/%{name} -type f | grep -v "\.orig" | \
     sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0640,squid,squid) %config(noreplace) /' >> %{name}.filelist
 
 cat > README.urpmi << EOF
-Be sure to change your /etc/dansguardian/dansguardian.conf to reflect your own 
+Be sure to change your /etc/%{name}/%{name}.conf to reflect your own 
 settings.
 Special attention must be given to the port that squid listens on, 
-the port that dansguardian will listen to and to the web url to the
-dansguardian.pl cgi-script.
+the port that %{name} will listen to and to the web url to the
+%{name}.pl cgi-script.
 
 Author: Daniel Barron
 daniel@jadeb.com
 EOF
 
 %preun
-%_preun_service dansguardian
+%_preun_service %{name}
 if [ $1 = 0 ] ; then
-    rm -f /var/log/dansguardian/*
+    rm -f /var/log/%{name}/*
 fi
 
 %post
-%_post_service dansguardian
-touch /var/log/dansguardian/access.log
-chown -R squid:squid /var/log/dansguardian
-chmod -R u+rw /var/log/dansguardian
-chmod u+rwx /var/log/dansguardian
+%_post_service %{name}
+touch /var/log/%{name}/access.log
+chown -R squid:squid /var/log/%{name}
+chmod -R u+rw /var/log/%{name}
+chmod u+rwx /var/log/%{name}
 
 %clean
 rm -rf %{buildroot}
@@ -161,12 +161,10 @@ rm -rf %{buildroot}
 %files -f %{name}.filelist
 %defattr(-,root,root)
 %doc README INSTALL LICENSE README.urpmi
-%attr(0644,squid,squid) %{_sysconfdir}/logrotate.d/dansguardian
-%attr(0755,root,root) %{_initrddir}/dansguardian
-%attr(0755,root,root) %{_sbindir}/%{new_name}
+%attr(0644,squid,squid) %{_sysconfdir}/logrotate.d/%{name}
+%attr(0755,root,root) %{_initrddir}/%{name}
+%attr(0755,root,root) %{_sbindir}/%{name}
 %attr(0644,root,root) %{_mandir}/man8/*
-%attr(0755,root,root) /var/www/cgi-bin/dansguardian.pl
+%attr(0755,root,root) /var/www/cgi-bin/%{name}.pl
 %attr(0755,apache,apache) /var/spool/MailScanner/quarantine
-%attr(0755,squid,squid) /var/log/dansguardian
-
-
+%attr(0755,squid,squid) /var/log/%{name}
