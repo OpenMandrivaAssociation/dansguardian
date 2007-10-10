@@ -1,28 +1,20 @@
-%define build_clamav 0
-%{?_with_clamav: %{expand: %%global build_clamav 1}}
-%{?_without_clamav: %{expand: %%global build_clamav 0}}
-
-%define AV_version 6.3.8
-
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.8.0.6
-Release:	%mkrel 1
+Version:	2.9.9.1
+Release:	%mkrel 0
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
-Source0:	http://www.%{name}.org/downloads/2/%{name}-%{version}.source.tar.bz2
-Source1:	%{name}.init
-Patch0:		%{name}-2.8.0.4-no-static-libz.diff
-# (oe) http://www.harvest.com.br/asp/afn/dg.nsf
-Patch3:		%{name}-2.8.0.4-antivirus-%{AV_version}.diff
+Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
+Source1:	dansguardian.init
 BuildRequires:	zlib-devel
-%if %{build_clamav}
-BuildRequires:	clamav-devel libesmtp5-devel
-%endif
+BuildRequires:	pcre-devel
+BuildRequires:	clamav-devel
+BuildRequires:	libesmtp-devel
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 Requires(pre):	squid
+Requires:	sendmail-command
 Requires:	webserver
 Requires:	squid
 Provides:	DansGuardian = %{version}-%{release}
@@ -44,70 +36,45 @@ than squidGuard.
 The filtering has configurable domain, user and ip exception lists. 
 SSL Tunneling is supported.
 
-You can build %{name} with some conditional build swithes;
-
-(ie. use with rpm --rebuild):
-
---with[out] clamav	ClamAV support (disabled)
-
-%if %{build_clamav}
-This is DansGuardian with http://www.pcxperience.org Anti-Virus
-Plugin v%{AV_version} built with ClamAV support. The Anti-Virus
-patch is now maintained by Aecio F. Neto at:
-
-http://www.harvest.com.br/asp/afn/dg.nsf
-%endif
-
 %prep
 
 %setup -q -n %{name}-%{version}
-%patch0 -p0
-
-%if %{build_clamav}
-%patch3 -p1
-%endif
 
 cp %{SOURCE1} %{name}.init
 
 %build
 %serverbuild
 
-./configure \
-    --installprefix=%{_prefix} \
-    --bindir=%{_bindir}/ \
-    --sysconfdir=%{_sysconfdir}/%{name}/ \
-    --sysvdir=%{_initrddir}/ \
-    --cgidir=/var/www/cgi-bin/ \
-    --mandir=%{_mandir}/ \
-    --logdir=/var/log/%{name}/ \
-    --runas_usr=squid \
-    --runas_grp=squid \
-    --piddir=/var/run \
-    --logrotatedir=%{_sysconfdir}/logrotate.d/
+%configure2_5x \
+    --enable-pcre=yes \
+    --enable-clamav=yes \
+    --enable-clamd=yes \
+    --enable-icap=yes \
+    --enable-kavd=no \
+    --enable-commandline=yes \
+    --enable-fancydm=yes \
+    --enable-trickledm=yes \
+    --enable-ntlm=yes \
+    --enable-email=yes \
+    --with-proxyuser=squid \
+    --with-proxygroup=squid \
+    --with-piddir=/var/run/%{name} \
+    --with-logdir=/var/log/%{name} \
+    --with-sysconfsubdir=%{name}
 
-%make OPTIMISE="$CFLAGS" WARNING="-Wall -Wno-deprecated"
+%make
 
 %install
 rm -rf %{buildroot}
 
-# don't fiddle with the initscript!
-export DONT_GPRINTIFY=1
-
-install -d %{buildroot}%{_sbindir}
-install -d %{buildroot}%{_mandir}/man8
-install -d %{buildroot}%{_sysconfdir}/%{name}
 install -d %{buildroot}%{_sysconfdir}/logrotate.d
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}/var/log/%{name}
-install -d %{buildroot}/var/spool/MailScanner/quarantine
+install -d %{buildroot}/var/run/%{name}
 install -d %{buildroot}/var/www/cgi-bin
 
-install -d bin
-PATH=$PWD/bin:$PATH
-ln -sf /bin/true bin/chown
+%makeinstall_std
 
-make install INSTALLPREFIX=%{buildroot} CHKCONF=nowhere
-mv %{buildroot}%{_bindir}/* %{buildroot}%{_sbindir}
 install -m0755 %{name}.init %{buildroot}%{_initrddir}/%{name}
 
 cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
@@ -123,6 +90,11 @@ cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
     endscript
 }
 EOF
+
+install -m0755 data/dansguardian.pl %{buildroot}/var/www/cgi-bin/
+
+# make sure this file is present
+echo "localhost" >> %{buildroot}%{_sysconfdir}/%{name}/lists/exceptionfileurllist
 
 # construct file lists
 find %{buildroot}%{_sysconfdir}/%{name} -type d | \
@@ -142,6 +114,9 @@ Author: Daniel Barron
 daniel@jadeb.com
 EOF
 
+# cleanup
+rm -rf %{_datadir}/%{name}/scripts
+
 %preun
 %_preun_service %{name}
 if [ $1 = 0 ] ; then
@@ -151,7 +126,7 @@ fi
 %post
 %_post_service %{name}
 touch /var/log/%{name}/access.log
-chown -R squid:squid /var/log/%{name}
+chown -R squid:squid /var/log/%{name} /var/run/%{name}
 chmod -R u+rw /var/log/%{name}
 chmod u+rwx /var/log/%{name}
 
@@ -160,11 +135,12 @@ rm -rf %{buildroot}
 
 %files -f %{name}.filelist
 %defattr(-,root,root)
-%doc README INSTALL LICENSE README.urpmi
+%doc AUTHORS COPYING README README.urpmi
 %attr(0644,squid,squid) %{_sysconfdir}/logrotate.d/%{name}
 %attr(0755,root,root) %{_initrddir}/%{name}
 %attr(0755,root,root) %{_sbindir}/%{name}
+%{_datadir}/%{name}
 %attr(0644,root,root) %{_mandir}/man8/*
 %attr(0755,root,root) /var/www/cgi-bin/%{name}.pl
-%attr(0755,apache,apache) /var/spool/MailScanner/quarantine
 %attr(0755,squid,squid) /var/log/%{name}
+%attr(0755,squid,squid) /var/run/%{name}
