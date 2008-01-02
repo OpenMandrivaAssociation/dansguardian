@@ -19,6 +19,7 @@ Requires:	webserver
 Requires:	squid
 Provides:	DansGuardian = %{version}-%{release}
 Obsoletes:	DansGuardian
+BuildRoot:	%{_tmppath}/%{name}-buildroot
 
 %description
 DansGuardian is a filtering proxy for Linux, FreeBSD, OpenBSD and Solaris. 
