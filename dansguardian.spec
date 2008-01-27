@@ -1,6 +1,6 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.9.9.1
+Version:	2.9.9.2
 Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
@@ -11,6 +11,8 @@ BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
 BuildRequires:	clamav-devel
 BuildRequires:	libesmtp-devel
+Requires(post): rpm-helper
+Requires(preun): rpm-helper
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 Requires(pre):	squid
@@ -117,6 +119,9 @@ EOF
 # cleanup
 rm -rf %{_datadir}/%{name}/scripts
 
+%pre
+%_pre_useradd squid %{_var}/spool/squid /bin/false
+
 %preun
 %_preun_service %{name}
 if [ $1 = 0 ] ; then
@@ -129,6 +134,9 @@ touch /var/log/%{name}/access.log
 chown -R squid:squid /var/log/%{name} /var/run/%{name}
 chmod -R u+rw /var/log/%{name}
 chmod u+rwx /var/log/%{name}
+
+%postun
+%_postun_userdel squid
 
 %clean
 rm -rf %{buildroot}
