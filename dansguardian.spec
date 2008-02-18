@@ -1,12 +1,13 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.9.9.2
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
 Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
 Source1:	dansguardian.init
+Patch0:		dansguardian-mdv_conf.diff
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
 BuildRequires:	clamav-devel
@@ -15,13 +16,13 @@ Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(pre): rpm-helper
 Requires(postun): rpm-helper
-Requires(pre):	squid
 Requires:	sendmail-command
-Requires:	webserver
-Requires:	squid
+%if %mdkversion >= 200810
+Suggests:	webproxy webserver
+%endif
 Provides:	DansGuardian = %{version}-%{release}
 Obsoletes:	DansGuardian
-BuildRoot:	%{_tmppath}/%{name}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 DansGuardian is a filtering proxy for Linux, FreeBSD, OpenBSD and Solaris. 
@@ -41,8 +42,12 @@ SSL Tunneling is supported.
 %prep
 
 %setup -q -n %{name}-%{version}
+%patch0 -p0
 
 cp %{SOURCE1} %{name}.init
+
+# fix path to the ipc files
+perl -pi -e "s|\@localstatedir\@|%{_localstatedir}|g" %{name}.init
 
 %build
 %serverbuild
@@ -58,8 +63,8 @@ cp %{SOURCE1} %{name}.init
     --enable-trickledm=yes \
     --enable-ntlm=yes \
     --enable-email=yes \
-    --with-proxyuser=squid \
-    --with-proxygroup=squid \
+    --with-proxyuser=%{name} \
+    --with-proxygroup=%{name} \
     --with-piddir=/var/run/%{name} \
     --with-logdir=/var/log/%{name} \
     --with-sysconfsubdir=%{name}
@@ -74,6 +79,7 @@ install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}/var/log/%{name}
 install -d %{buildroot}/var/run/%{name}
 install -d %{buildroot}/var/www/cgi-bin
+install -d %{buildroot}%{_localstatedir}/%{name}/tmp
 
 %makeinstall_std
 
@@ -81,6 +87,7 @@ install -m0755 %{name}.init %{buildroot}%{_initrddir}/%{name}
 
 cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 /var/log/%{name}/access.log {
+    create 644 %{name} %{name}
     rotate 5
     weekly
     sharedscripts
@@ -100,27 +107,27 @@ echo "localhost" >> %{buildroot}%{_sysconfdir}/%{name}/lists/exceptionfileurllis
 
 # construct file lists
 find %{buildroot}%{_sysconfdir}/%{name} -type d | \
-    sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0755,squid,squid) %dir /' > %{name}.filelist
+    sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0755,root,root) %dir /' > %{name}.filelist
 
 find %{buildroot}%{_sysconfdir}/%{name} -type f | grep -v "\.orig" | \
-    sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0640,squid,squid) %config(noreplace) /' >> %{name}.filelist
+    sed -e "s|%{buildroot}||" | sed -e 's/^/%attr(0644,root,root) %config(noreplace) /' >> %{name}.filelist
 
 cat > README.urpmi << EOF
-Be sure to change your /etc/%{name}/%{name}.conf to reflect your own 
-settings.
-Special attention must be given to the port that squid listens on, 
-the port that %{name} will listen to and to the web url to the
-%{name}.pl cgi-script.
+Make sure to change your /etc/%{name}/%{name}.conf to reflect your own settings.
+Special attention must be given to the port that the proxy server is listening to, 
+the port that %{name} will listen to and to the web url to the %{name}.pl cgi-script.
 
 Author: Daniel Barron
 daniel@jadeb.com
 EOF
 
+touch %{buildroot}/var/log/%{name}/access.log
+
 # cleanup
-rm -rf %{_datadir}/%{name}/scripts
+rm -rf %{buildroot}%{_datadir}/%{name}/scripts
 
 %pre
-%_pre_useradd squid %{_var}/spool/squid /bin/false
+%_pre_useradd %{name} %{_localstatedir}/%{name} /bin/false
 
 %preun
 %_preun_service %{name}
@@ -129,14 +136,11 @@ if [ $1 = 0 ] ; then
 fi
 
 %post
+%create_ghostfile /var/log/%{name}/access.log %{name} %{name} 644
 %_post_service %{name}
-touch /var/log/%{name}/access.log
-chown -R squid:squid /var/log/%{name} /var/run/%{name}
-chmod -R u+rw /var/log/%{name}
-chmod u+rwx /var/log/%{name}
 
 %postun
-%_postun_userdel squid
+%_postun_userdel %{name}
 
 %clean
 rm -rf %{buildroot}
@@ -144,11 +148,14 @@ rm -rf %{buildroot}
 %files -f %{name}.filelist
 %defattr(-,root,root)
 %doc AUTHORS COPYING README README.urpmi
-%attr(0644,squid,squid) %{_sysconfdir}/logrotate.d/%{name}
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(0755,root,root) %{_initrddir}/%{name}
 %attr(0755,root,root) %{_sbindir}/%{name}
 %{_datadir}/%{name}
-%attr(0644,root,root) %{_mandir}/man8/*
 %attr(0755,root,root) /var/www/cgi-bin/%{name}.pl
-%attr(0755,squid,squid) /var/log/%{name}
-%attr(0755,squid,squid) /var/run/%{name}
+%dir %attr(0755,%{name},%{name}) /var/log/%{name}
+%dir %attr(0755,%{name},%{name}) /var/run/%{name}
+%dir %attr(0755,%{name},%{name}) %{_localstatedir}/%{name}
+%dir %attr(0755,%{name},%{name}) %{_localstatedir}/%{name}/tmp
+%ghost %attr(0644,%{name},%{name}) /var/log/%{name}/access.log
+%attr(0644,root,root) %{_mandir}/man8/*
