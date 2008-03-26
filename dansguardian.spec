@@ -1,12 +1,13 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.9.9.2
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
 Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
 Source1:	dansguardian.init
+Source2:	languages.tar.bz2
 Patch0:		dansguardian-mdv_conf.diff
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
@@ -48,6 +49,11 @@ cp %{SOURCE1} %{name}.init
 
 # fix path to the ipc files
 perl -pi -e "s|\@localstatedir\@|%{_localstatedir}|g" %{name}.init
+
+# mdv design
+pushd data
+    tar -jxf %{SOURCE2}
+popd
 
 %build
 %serverbuild
