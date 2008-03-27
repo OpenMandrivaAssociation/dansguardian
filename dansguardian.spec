@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.9.9.2
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -43,7 +43,7 @@ SSL Tunneling is supported.
 %prep
 
 %setup -q -n %{name}-%{version}
-%patch0 -p0
+%patch0 -p1
 
 cp %{SOURCE1} %{name}.init
 
