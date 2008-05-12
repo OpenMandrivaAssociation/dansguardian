@@ -1,6 +1,6 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.9.9.3
+Version:	2.9.9.4
 Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
@@ -9,10 +9,9 @@ Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
 Source1:	dansguardian.init
 Source2:	languages.tar.bz2
 Patch0:		dansguardian-mdv_conf.diff
-Patch1:		dansguardian-clamav-0.93_build_fix.diff
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
-BuildRequires:	clamav-devel
+BuildRequires:	clamav-devel >= 0.93
 BuildRequires:	libesmtp-devel
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -45,7 +44,6 @@ SSL Tunneling is supported.
 
 %setup -q -n %{name}-%{version}
 %patch0 -p1
-%patch1 -p0
 
 cp %{SOURCE1} %{name}.init
 
