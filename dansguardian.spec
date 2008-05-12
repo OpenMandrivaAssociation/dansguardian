@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.9.9.4
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -89,6 +89,9 @@ install -d %{buildroot}%{_localstatedir}/%{name}/tmp
 
 %makeinstall_std
 
+# cleanup
+rm -rf %{buildroot}%{_datadir}/doc/dansguardian*
+
 install -m0755 %{name}.init %{buildroot}%{_initrddir}/%{name}
 
 cat << EOF > %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
@@ -154,6 +157,8 @@ rm -rf %{buildroot}
 %files -f %{name}.filelist
 %defattr(-,root,root)
 %doc AUTHORS COPYING README README.urpmi
+%doc doc/AuthPlugins doc/ContentScanners doc/DownloadManagers
+%doc doc/FAQ doc/FAQ.html doc/Plugins
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(0755,root,root) %{_initrddir}/%{name}
 %attr(0755,root,root) %{_sbindir}/%{name}
