@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.9.9.7
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -48,7 +48,7 @@ SSL Tunneling is supported.
 cp %{SOURCE1} %{name}.init
 
 # fix path to the ipc files
-perl -pi -e "s|\@localstatedir\@|%{_localstatedir}/lib|g" %{name}.init
+perl -pi -e "s|\@localstatedir\@|/var/lib|g" %{name}.init
 
 # mdv design
 pushd data
@@ -59,6 +59,7 @@ popd
 %serverbuild
 
 %configure2_5x \
+    --localstatedir=/var/lib \
     --enable-pcre=yes \
     --enable-clamav=yes \
     --enable-clamd=yes \
@@ -85,7 +86,7 @@ install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}/var/log/%{name}
 install -d %{buildroot}/var/run/%{name}
 install -d %{buildroot}/var/www/cgi-bin
-install -d %{buildroot}%{_localstatedir}/lib/%{name}/tmp
+install -d %{buildroot}/var/lib/%{name}/tmp
 
 %makeinstall_std
 
@@ -136,7 +137,7 @@ touch %{buildroot}/var/log/%{name}/access.log
 rm -rf %{buildroot}%{_datadir}/%{name}/scripts
 
 %pre
-%_pre_useradd %{name} %{_localstatedir}/lib/%{name} /bin/false
+%_pre_useradd %{name} /var/lib/%{name} /bin/false
 
 %preun
 %_preun_service %{name}
@@ -166,7 +167,7 @@ rm -rf %{buildroot}
 %attr(0755,root,root) /var/www/cgi-bin/%{name}.pl
 %dir %attr(0755,%{name},%{name}) /var/log/%{name}
 %dir %attr(0755,%{name},%{name}) /var/run/%{name}
-%dir %attr(0755,%{name},%{name}) %{_localstatedir}/lib/%{name}
-%dir %attr(0755,%{name},%{name}) %{_localstatedir}/lib/%{name}/tmp
+%dir %attr(0755,%{name},%{name}) /var/lib/%{name}
+%dir %attr(0755,%{name},%{name}) /var/lib/%{name}/tmp
 %ghost %attr(0644,%{name},%{name}) /var/log/%{name}/access.log
 %attr(0644,root,root) %{_mandir}/man8/*
