@@ -1,6 +1,6 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.10
+Version:	2.10.0.1
 Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
