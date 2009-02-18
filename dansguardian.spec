@@ -1,6 +1,6 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.10.0.2
+Version:	2.10.0.3
 Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
@@ -26,18 +26,18 @@ Obsoletes:	DansGuardian
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-DansGuardian is a filtering proxy for Linux, FreeBSD, OpenBSD and Solaris. 
-It filters using multiple methods. These methods include URL and domain 
+DansGuardian is a filtering proxy for Linux, FreeBSD, OpenBSD and Solaris.
+It filters using multiple methods. These methods include URL and domain
 filtering, content phrase filtering, PICS filtering, MIME filtering, file
 extension filtering, POST filtering.
 
 The content phrase filtering will check for pages that contain profanities
 and phrases often associated with pornography and other undesirable content.
-The POST filtering allows you to block or limit web upload.  The URL and 
+The POST filtering allows you to block or limit web upload.  The URL and
 domain filtering is able to handle huge lists and is significantly faster
 than squidGuard.
 
-The filtering has configurable domain, user and ip exception lists. 
+The filtering has configurable domain, user and ip exception lists.
 SSL Tunneling is supported.
 
 %prep
@@ -124,7 +124,7 @@ find %{buildroot}%{_sysconfdir}/%{name} -type f | grep -v "\.orig" | \
 
 cat > README.urpmi << EOF
 Make sure to change your /etc/%{name}/%{name}.conf to reflect your own settings.
-Special attention must be given to the port that the proxy server is listening to, 
+Special attention must be given to the port that the proxy server is listening to,
 the port that %{name} will listen to and to the web url to the %{name}.pl cgi-script.
 
 Author: Daniel Barron
