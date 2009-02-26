@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.0.3
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -11,7 +11,6 @@ Source2:	languages.tar.bz2
 Patch0:		dansguardian-mdv_conf.diff
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
-BuildRequires:	clamav-devel >= 0.93
 BuildRequires:	libesmtp-devel
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
@@ -61,8 +60,8 @@ popd
 %configure2_5x \
     --localstatedir=/var/lib \
     --enable-pcre=yes \
-    --enable-clamav=yes \
-    --enable-clamd=yes \
+    --enable-clamav=no \
+    --enable-clamd=no \
     --enable-icap=yes \
     --enable-kavd=no \
     --enable-commandline=yes \
