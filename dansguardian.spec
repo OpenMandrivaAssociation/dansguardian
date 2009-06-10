@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.10.0.3
-Release:	%mkrel 2
+Version:	2.10.1.1
+Release:	%mkrel 1
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -63,7 +63,7 @@ popd
     --localstatedir=/var/lib \
     --enable-pcre=yes \
     --enable-clamav=no \
-    --enable-clamd=no \
+    --enable-clamd=yes \
     --enable-icap=yes \
     --enable-kavd=no \
     --enable-commandline=yes \
@@ -71,6 +71,7 @@ popd
     --enable-trickledm=yes \
     --enable-ntlm=yes \
     --enable-email=yes \
+    --enable-orig-ip=yes \
     --with-proxyuser=%{name} \
     --with-proxygroup=%{name} \
     --with-piddir=/var/run/%{name} \
