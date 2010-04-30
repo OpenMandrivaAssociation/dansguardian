@@ -1,7 +1,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -19,7 +19,7 @@ Requires(pre): rpm-helper
 Requires(postun): rpm-helper
 Requires:	sendmail-command
 %if %mdkversion >= 200810
-Suggests:	webproxy webserver
+Suggests:	webproxy webserver c-icap-server
 %endif
 Provides:	DansGuardian = %{version}-%{release}
 Obsoletes:	DansGuardian
