@@ -1,7 +1,14 @@
+%define clamav 0
+# commandline overrides:
+# rpm -ba|--rebuild --with 'xxx'
+%{?_with_clamav: %{expand: %%global clamav 1}}
+%{?_without_clamav: %{expand: %%global clamav 0}}
+
+
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
@@ -13,6 +20,10 @@ Patch1: 	dansguardian-2.10.0.3-gcc44.patch
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
 BuildRequires:	libesmtp-devel
+%if %{clamav}
+BuildRequires:  clamav-devel
+%endif
+
 Requires(post): rpm-helper
 Requires(preun): rpm-helper
 Requires(pre): rpm-helper
@@ -62,7 +73,11 @@ popd
 %configure2_5x \
     --localstatedir=/var/lib \
     --enable-pcre=yes \
+%if %{clamav}
+    --enable-clamav=yes \
+%else
     --enable-clamav=no \
+%endif
     --enable-clamd=yes \
     --enable-icap=yes \
     --enable-kavd=no \
