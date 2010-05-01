@@ -1,4 +1,9 @@
-%define clamav 0
+#  lets support clamav only when backpoting by default
+%if %mdkversion < 200910
+	%define clamav 1
+%else
+	%define clamav 0
+%endif
 # commandline overrides:
 # rpm -ba|--rebuild --with 'xxx'
 %{?_with_clamav: %{expand: %%global clamav 1}}
@@ -8,7 +13,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
