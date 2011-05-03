@@ -13,7 +13,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	%mkrel 6
+Release:	%mkrel 7
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
