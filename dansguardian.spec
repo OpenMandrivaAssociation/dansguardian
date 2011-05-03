@@ -22,6 +22,7 @@ Source1:	dansguardian.init
 Source2:	languages.tar.bz2
 Patch0:		dansguardian-mdv_conf.diff
 Patch1: 	dansguardian-2.10.0.3-gcc44.patch
+Patch2:		dansguardian-2.10.1.1-gcc46.patch
 BuildRequires:	zlib-devel
 BuildRequires:	pcre-devel
 BuildRequires:	libesmtp-devel
@@ -61,6 +62,8 @@ SSL Tunneling is supported.
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p0
+
 
 cp %{SOURCE1} %{name}.init
 
