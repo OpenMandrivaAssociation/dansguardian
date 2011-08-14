@@ -13,13 +13,17 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	%mkrel 7
+Release:	%mkrel 8
 License:	GPL
 Group:		System/Servers
 URL:		http://www.dansguardian.org
 Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
 Source1:	dansguardian.init
 Source2:	languages.tar.bz2
+Source10:	bigblacklist.tar.gz
+Source11:	badwords.zip
+Source12:	new.zip
+Source13:	extrem.zip
 Patch0:		dansguardian-mdv_conf.diff
 Patch1: 	dansguardian-2.10.0.3-gcc44.patch
 Patch2:		dansguardian-2.10.1.1-gcc46.patch
@@ -58,12 +62,19 @@ The filtering has configurable domain, user and ip exception lists.
 SSL Tunneling is supported.
 
 %prep
+#tar xf %{SOURCE10}
+#unzip -xo %{SOURCE11}
+#unzip -xo %{SOURCE12}
+#unzip -xo %{SOURCE13} -d extrem
 
 %setup -q -n %{name}-%{version}
 %patch0 -p1
 %patch1 -p1
 %patch2 -p0
-
+tar -C configs/lists/ -xf %{SOURCE10} 
+unzip -xo %{SOURCE11} -d configs/lists/phraselists/
+unzip -xo %{SOURCE12} -d configs/lists/phraselists/
+unzip -xo %{SOURCE13} -d configs/lists/phraselists/extremism
 
 cp %{SOURCE1} %{name}.init
 
