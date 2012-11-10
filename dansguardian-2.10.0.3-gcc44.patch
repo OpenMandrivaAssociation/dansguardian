@@ -1,0 +1,44 @@
+diff -Naurp dansguardian-2.10.1.1/src/ConnectionHandler.cpp dansguardian-2.10.1.1.oden/src/ConnectionHandler.cpp
+--- dansguardian-2.10.1.1/src/ConnectionHandler.cpp	2009-02-25 12:36:22.000000000 +0100
++++ dansguardian-2.10.1.1.oden/src/ConnectionHandler.cpp	2009-06-10 15:37:51.000000000 +0200
+@@ -44,6 +44,7 @@
+ #include <istream>
+ 
+ #ifdef ENABLE_ORIG_IP
++#include <climits>
+ #include <linux/types.h>
+ #include <linux/netfilter_ipv4.h>
+ #endif
+diff -Naurp dansguardian-2.10.1.1/src/contentscanners/commandlinescan.cpp dansguardian-2.10.1.1.oden/src/contentscanners/commandlinescan.cpp
+--- dansguardian-2.10.1.1/src/contentscanners/commandlinescan.cpp	2008-11-18 12:27:04.000000000 +0100
++++ dansguardian-2.10.1.1.oden/src/contentscanners/commandlinescan.cpp	2009-06-10 15:37:34.000000000 +0200
+@@ -35,6 +35,7 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ #include <list>
++#include <cstdio>
+ 
+ 
+ // GLOBALS
+diff -Naurp dansguardian-2.10.1.1/src/contentscanners/icapscan.cpp dansguardian-2.10.1.1.oden/src/contentscanners/icapscan.cpp
+--- dansguardian-2.10.1.1/src/contentscanners/icapscan.cpp	2008-11-18 12:27:04.000000000 +0100
++++ dansguardian-2.10.1.1.oden/src/contentscanners/icapscan.cpp	2009-06-10 15:37:34.000000000 +0200
+@@ -36,6 +36,7 @@
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <netdb.h>		// for gethostby
++#include <cstdio>
+ 
+ 
+ // DEFINES
+diff -Naurp dansguardian-2.10.1.1/src/downloadmanagers/fancy.cpp dansguardian-2.10.1.1.oden/src/downloadmanagers/fancy.cpp
+--- dansguardian-2.10.1.1/src/downloadmanagers/fancy.cpp	2008-11-18 12:27:04.000000000 +0100
++++ dansguardian-2.10.1.1.oden/src/downloadmanagers/fancy.cpp	2009-06-10 15:37:34.000000000 +0200
+@@ -32,6 +32,7 @@
+ #include <unistd.h>
+ #include <iostream>
+ #include <math.h>
++#include <cstdio>
+ 
+ 
+ // GLOBALS
