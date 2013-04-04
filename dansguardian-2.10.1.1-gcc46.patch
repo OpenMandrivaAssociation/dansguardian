@@ -1,5 +1,5 @@
---- src/authplugins/ntlm.cpp.gcc	2011-05-03 11:42:10.000000000 +0200
-+++ src/authplugins/ntlm.cpp	2011-05-03 11:44:48.000000000 +0200
+--- ./src/authplugins/ntlm.cpp.gcc	2011-05-03 11:42:10.000000000 +0200
++++ ./src/authplugins/ntlm.cpp	2011-05-03 11:44:48.000000000 +0200
 @@ -28,7 +28,7 @@
  #include "../OptionContainer.hpp"
  
