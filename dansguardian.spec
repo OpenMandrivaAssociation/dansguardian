@@ -62,7 +62,7 @@ unzip -xo %{SOURCE13} -d configs/lists/phraselists/extremism
 cp %{SOURCE1} %{name}.init
 
 # fix path to the ipc files
-sedi -e "s|\@localstatedir\@|/var/lib|g" %{name}.init
+sed -i -e "s|\@localstatedir\@|/var/lib|g" %{name}.init
 
 # mdv design
 pushd data
@@ -71,7 +71,6 @@ popd
 
 %build
 %serverbuild
-
 %configure2_5x \
 	--localstatedir=/var/lib \
 	--enable-pcre=yes \
