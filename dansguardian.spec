@@ -9,7 +9,7 @@
 Summary:	A content filtering web proxy
 Name:		dansguardian
 Version:	2.10.1.1
-Release:	11
+Release:	12
 License:	GPLv2
 Group:		System/Servers
 Url:		http://www.dansguardian.org
