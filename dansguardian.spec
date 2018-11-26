@@ -4,12 +4,27 @@
 # rpm -ba|--rebuild --with 'xxx'
 %{?_with_clamav: %{expand: %%global clamav 1}}
 %{?_without_clamav: %{expand: %%global clamav 0}}
+++++++++++++++++++++++
+++++++++++++++++++++++
+++++++++++++++++++++++
+++++++++++++++++++++++
+REPLACE WITH e2guardian
+REPLACE WITH e2guardian
+REPLACE WITH e2guardian
+REPLACE WITH e2guardian
+REPLACE WITH e2guardian
+REPLACE WITH e2guardian
+++++++++++++++++++++++
+++++++++++++++++++++++
+++++++++++++++++++++++
+++++++++++++++++++++++
+++++++++++++++++++++++
 
 
 Summary:	A content filtering web proxy
 Name:		dansguardian
-Version:	2.10.1.1
-Release:	20
+Version:	2.12.0.3
+Release:	1
 License:	GPLv2
 Group:		System/Servers
 Url:		http://www.dansguardian.org
