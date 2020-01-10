@@ -67,7 +67,7 @@ SSL Tunneling is supported.
 
 %prep
 %setup -q
-%apply_patches
+%autopatch -p1
 
 tar -C configs/lists/ -xf %{SOURCE10} 
 unzip -xo %{SOURCE11} -d configs/lists/phraselists/
