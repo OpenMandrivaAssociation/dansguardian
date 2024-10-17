@@ -27,7 +27,7 @@ Version:	2.12.0.3
 Release:	1
 License:	GPLv2
 Group:		System/Servers
-Url:		http://www.dansguardian.org
+Url:		https://www.dansguardian.org
 Source0:	http://www.dansguardian.org/downloads/2/dansguardian-%{version}.tar.gz
 Source1:	dansguardian.init
 Source2:	languages.tar.bz2
