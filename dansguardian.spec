@@ -39,6 +39,11 @@ Patch0:		dansguardian-mdv_conf.diff
 Patch1: 	dansguardian-2.10.0.3-gcc44.patch
 Patch2:		dansguardian-2.10.1.1-gcc46.patch
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	libesmtp-devel
 BuildRequires:	pkgconfig(libpcre)
 BuildRequires:	pkgconfig(zlib)
